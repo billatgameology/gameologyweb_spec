@@ -1,8 +1,8 @@
 # Dedicated Music Space Specification
 
 **Spec ID:** `FEAT-MUSIC-SPACE-001`  
-**Version:** `1.1`  
-**Status:** `Draft`  
+**Version:** `2.0`  
+**Status:** `Ready for Development`  
 **Created:** `2025-09-26`  
 **Last Updated:** `2025-09-27`  
 **Author(s):** `Bill Wang`
@@ -18,7 +18,7 @@ Users who enjoy the hero page's ambient music have no way to listen to the full 
 
 **Secondary Goal:** Create a "digital zen garden" or "chill" space on the site for users who want to relax or focus on other tasks with ambient background music.
 
-**Tertiary Goal:** Enhance the hero section with a dynamic animation of stars forming constellations, paired with uplifting messages that appear at regular intervals.
+**Tertiary Goal:** Enhance the starfield background with dynamic constellation animations, paired with uplifting messages that appear at regular 60-second intervals.
 
 ### Non-Goals
 
@@ -51,68 +51,144 @@ The player should attempt to buffer and resume playback gracefully without losin
 So that my listening experience is not abruptly reset.
 ```
 
+```
+As a user,
+When I navigate away from the music space,
+The original website's background music should resume control,
+So that the audio experience remains consistent across the site.
+```
+
 ## Requirements
 
 ### Functional Requirements
 
 | ID | Requirement | Priority | Acceptance Criteria |
 |----|-------------|----------|---------------------|
-| FR-01 | Continuous Playback | High | The full "Endless Drifting" album plays from the first to the last track and then loops back to the beginning automatically. |
-| FR-02 | Persistent Audio Controls | High | User has access to controls for play/pause, next track, previous track, and volume adjustment. These controls are always visible. |
+| FR-01 | Continuous Playbook | High | The full "Endless Drifting" album plays from the first to the last track and then loops back to the beginning automatically. |
+| FR-02 | Traditional Music Controls | High | User has access to album selector, track list, play/pause, next/previous track, volume adjustment, and progress bar with scrubbing capability. |
 | FR-03 | Dedicated URL | High | The music space is accessible via a unique and easily shareable URL, e.g., /music-space. |
-| FR-04 | Minimalist UI | High | The UI consists solely of the hero page visual background and the persistent audio control component. |
-| FR-05 | Track Information Display | Medium | The name of the currently playing track is displayed within the audio control component. |
-| FR-06 | Constellation Animation Cycle | High | The background animation follows a distinct, repeating cycle: 1. A new set of stars appears. 2. Stars begin to glow. 3. Lines connect the stars to form a constellation. 4. An uplifting message and the constellation name appear. 5. The message fades out. 6. The constellation and its name fade out, and the cycle repeats. |
-| FR-07 | Dynamic Content Loading | High | The constellation data (star positions, connections) and associated messages are loaded from a data source, not hardcoded. |
+| FR-04 | Minimalist UI | High | The UI consists of the starfield background with expandable/collapsible music controls overlay. |
+| FR-05 | Track Information Display | Medium | The currently playing track and album information is displayed within the audio control component. |
+| FR-06 | Constellation Animation Cycle | High | The background animation follows a distinct, repeating 60-second cycle: 1. Starfield appears 2. Yellow stars automatically connect one-by-one over 2 seconds 3. Constellation name and uplifting lore message appear 4. Message fades out 5. Constellation floats with label (variable duration buffer) 6. New song triggers restart of cycle |
+| FR-07 | Dynamic Content Loading | High | Constellation data (star positions, connections, lore) is randomly selected from constellations.json (1000+ entries). |
+| FR-08 | Audio Management | High | Override existing website background music when entering music space. Restore original audio control when navigating away. |
+| FR-09 | User Interaction Gate | High | Display entry message "You have entered music space, click to enter" to comply with autoplay policies and require user interaction before starting music. |
+| FR-10 | Multiple Albums Support | Medium | Support selection between multiple albums from music index.json structure. |
 
 ### Non-Functional Requirements
 
 | ID | Requirement | Target | Measurement |
 |----|-------------|--------|-------------|
-| NFR-01 | Performance | Initial load < 2s. Animations must maintain a smooth framerate. | Lighthouse, Browser Performance Profiler |
-| NFR-02 | Accessibility | WCAG 2.1 AA | Audio controls must be fully keyboard-navigable and screen-reader compatible. Uplifting messages must be legible with sufficient color contrast. |
+| NFR-01 | Performance | Initial load < 2s. Animations must maintain smooth framerate (60fps). | Lighthouse, Browser Performance Profiler |
+| NFR-02 | Accessibility | WCAG 2.1 AA | Audio controls fully keyboard-navigable and screen-reader compatible. Lore messages have sufficient color contrast. |
 | NFR-03 | Browser Support | Latest 2 versions of Chrome, Firefox, Safari, Edge | Manual and automated cross-browser testing. |
+| NFR-04 | Mobile Responsiveness | Touch-friendly controls on mobile devices | Controls adapt to mobile with bottom drawer UI |
 
 ## Design Specification
 
 ### User Interface
 
-The UI will be a full-screen view of the existing hero page's animated starry background, which will now include a constellation animation cycle. A single, persistent audio control component will be overlaid at the bottom of the screen.
+The UI will be a full-screen view of the StarFieldHero animated background, enhanced with automatic constellation formation cycles. Music controls will be presented as responsive overlays.
 
 ### Visual Design
 
-- **Background:** Reuse the existing hero page background component, which will serve as the canvas for the new constellation animations.
+**Background:** Reuse the StarFieldHero component's starfield animation system, including:
+- Purple particle field with rotation
+- Yellow star generation and connection mechanics
+- Glassmorphic lore panel system
+- Word-by-word text animation
 
-- **Controls:** A minimalist, floating control bar with clean icons for play/pause, next, previous, and a volume slider. The current track title will be displayed.
+**Controls:** 
+- **Desktop:** Expandable/collapsible overlay with traditional music player interface
+- **Mobile:** Bottom drawer that slides up for full controls, collapses to minimal "now playing" bar
+- **Auto-collapse:** After inactivity timeout on mobile
+- **Swipe gestures:** Up to expand, down to collapse on mobile
 
-- **Animation Sequence:**
-  1. **Starfield Reset:** The background returns to a simple field of a few static yellow stars.
-  2. **Glow and Connect:** The stars begin to glow brightly. Animated lines then draw between the stars one by one, forming the shape of a constellation.
-  3. **Message Reveal:** An uplifting message and the name of the constellation fade in together.
-  4. **Message Fade:** After a set delay, the uplifting message fades out, leaving only the constellation and its name.
-  5. **Constellation Fade:** After another delay, the constellation and its name fade out, resetting the scene for the next cycle.
+**Animation Sequence (60-second cycles):**
+1. **Starfield Base:** Purple particles with rotation (adapted from StarFieldHero)
+2. **Star Connection:** Yellow stars appear and auto-connect one-by-one over 2 seconds
+3. **Lore Panel:** Constellation name and uplifting lore message appear using glassmorphic panel
+4. **Message Fade:** Lore panel auto-dismisses after reading time
+5. **Constellation Float:** Constellation remains visible with label for variable buffer duration
+6. **Cycle Restart:** New song triggers immediate restart of sequence
 
-- **Responsive Behavior:** The control bar and any text will adapt to mobile screen sizes, ensuring controls are large enough for touch targets and text is readable.
+### Technical Architecture
+
+```
+ConstellationMusicSpace/
+├── StarFieldBackground (adapted from StarFieldHero)
+├── ConstellationAnimator (5-phase cycle manager)
+├── MusicPlayer (traditional controls)
+│   ├── AlbumSelector (dropdown/grid)
+│   ├── TrackList (for selected album)
+│   ├── PlayerControls (play/pause/next/prev/volume/progress)
+│   └── ResponsiveDrawer (mobile/desktop layouts)
+├── LorePanel (adapted from StarFieldHero)
+└── AudioManager (override site music, restore on exit)
+```
+
+### Music Integration
+
+**Timing Logic:**
+- Each constellation cycle = 60 seconds fixed duration
+- Song duration ÷ 60 = number of full constellation cycles per song
+- Remainder time extends the final "constellation floating with label" phase
+- New song start = immediate restart of constellation cycle
+- Example: 3:13 song = 3 full cycles (3 minutes) + 13 second extended final phase
+
+**Data Sources:**
+- Music metadata: `/public/music/index.json` and `/public/music/{album-id}/metadata.json`
+- Audio files: `/public/music/{album-id}/*.m4a`
+- Constellation data: `constellations.json` (random selection from 1000+ entries)
 
 ### Interaction Design
 
-- **On-Load:** Music begins playing automatically once the user interacts with the document (to comply with autoplay policies). The animation cycle starts immediately on load.
-- **Controls:** Standard interactions for a media player. Clicking play/pause toggles the audio state. Next/previous skips tracks within the album playlist.
+**Entry Flow:**
+1. User navigates to `/music-space`
+2. Starfield loads immediately
+3. Entry gate displays: "You have entered music space, click to enter"
+4. User click triggers music start and constellation cycle
+5. Defaults to first track of first album at 50% volume
+
+**Audio Management:**
+- Override any existing site background music on entry
+- Restore original site audio control on navigation away
+- Graceful buffering and resume for network interruptions
+
+### Responsive Behavior
+
+**Desktop:**
+- Expandable/collapsible music control overlay
+- Full traditional music player interface
+- Hover states and smooth transitions
+
+**Mobile:**
+- Bottom drawer UI pattern
+- Swipe gestures (up/down) for expand/collapse
+- Auto-collapse after inactivity
+- Touch-friendly control sizes
+- Minimal "now playing" bar when collapsed
 
 ## Success Criteria
 
 ### Definition of Done
 
-- [ ] All functional requirements are implemented and pass acceptance criteria.
-- [ ] The music player correctly loops the full album.
-- [ ] The constellation animation cycle works as specified and loops with new content.
-- [ ] UI is responsive and functions correctly on mobile and desktop.
-- [ ] Accessibility standards for media controls and text are met.
-- [ ] The feature is live and accessible at the /music-space URL.
+- [ ] All functional requirements are implemented and pass acceptance criteria
+- [ ] Music player supports album selection and full traditional controls
+- [ ] Constellation animation cycle works with 60-second timing and music sync
+- [ ] Audio management correctly overrides site music and restores on exit
+- [ ] Entry gate requires user interaction before autoplay
+- [ ] UI is fully responsive with mobile drawer and desktop overlay
+- [ ] Random constellation selection from constellations.json works
+- [ ] Accessibility standards for media controls and text are met
+- [ ] Feature is live and accessible at the /music-space URL
+- [ ] Performance targets are met (load time, animation framerate)
 
+## Technical Decisions
 
-## Open Questions
-
-- [ ] Should we display the full tracklist, or only the current song? (Decision: Start with current song only for minimalism).
-- [ ] What is the ideal initial volume level? (Decision: Default to 50%).
-- [ ] What should the timing/interval be for the animation cycle? (Decision: Target a 60-second cycle for each constellation).
+- **Audio Format:** M4A files in `/public/music/{album-id}/` directories
+- **Constellation Selection:** Truly random from constellations.json (no filtering)
+- **Initial Volume:** Default to 50%
+- **Mobile Drawer:** Auto-collapse after inactivity with minimal "now playing" display
+- **Timing Cycle:** Fixed 60-second constellation cycles with variable buffer extension
+- **Component Architecture:** New component (not extending StarFieldHero) with shared systems
