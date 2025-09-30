@@ -1,10 +1,10 @@
 # Dedicated Music Space Specification
 
 **Spec ID:** `FEAT-MUSIC-SPACE-001`  
-**Version:** `3.0`  
+**Version:** `3.1`  
 **Status:** `Implemented - Production Ready`  
 **Created:** `2025-09-26`  
-**Last Updated:** `2025-09-28`  
+**Last Updated:** `2025-09-30`  
 **Author(s):** `Bill Wang`
 
 ## Overview
@@ -71,9 +71,10 @@ So that the audio experience remains consistent across the site.
 | FR-05 | Track Information Display | Medium | The currently playing track and album information is displayed within the audio control component. |
 | FR-06 | Constellation Animation Cycle | High | IMPLEMENTED: The background animation follows a streamlined cycle: 1. Stars appear in random positions 2. Stars connect sequentially using linear algorithm 3. Constellation label appears in 3D space above constellation 4. Lore panel displays at bottom center with word-by-word animation 5. Both label and lore panel persist until next cycle |
 | FR-07 | Dynamic Content Loading | High | IMPLEMENTED: Constellation data (star positions, connections, lore) is randomly selected from constellations.json (1000+ entries) with randomized star positioning and connection patterns. |
-| FR-08 | Audio Management | High | IMPLEMENTED: Override existing website background music when entering music space. Music auto-play on track selection. Restore original audio control when navigating away. |
+| FR-08 | Audio Management | High | IMPLEMENTED: Override existing website background music when entering music space. Music auto-play on track selection with continuous playback through track progression. Restore original audio control when navigating away. Fixed auto-play after track end to ensure seamless music experience. |
 | FR-09 | User Interaction Gate | High | Display entry message "You have entered music space, click to enter" to comply with autoplay policies and require user interaction before starting music. |
 | FR-10 | Multiple Albums Support | Medium | Support selection between multiple albums from music index.json structure. |
+| FR-11 | Responsive Lore Panel Positioning | High | IMPLEMENTED: Enhanced lore panel with device-specific positioning - mobile (100px from bottom), tablet (20% from bottom), desktop (13% from bottom) to prevent overlap with music player controls. Optimized max heights for each breakpoint. |
 
 ### Non-Functional Requirements
 
@@ -82,7 +83,7 @@ So that the audio experience remains consistent across the site.
 | NFR-01 | Performance | Initial load < 2s. Animations must maintain smooth framerate (60fps). | Lighthouse, Browser Performance Profiler |
 | NFR-02 | Accessibility | WCAG 2.1 AA | Audio controls fully keyboard-navigable and screen-reader compatible. Lore messages have sufficient color contrast. |
 | NFR-03 | Browser Support | Latest 2 versions of Chrome, Firefox, Safari, Edge | Manual and automated cross-browser testing. |
-| NFR-04 | Mobile Responsiveness | Touch-friendly controls on mobile devices | Controls adapt to mobile with bottom drawer UI |
+| NFR-04 | Mobile Responsiveness | Touch-friendly controls on mobile devices | Controls adapt to mobile with bottom drawer UI. Lore panel positioning optimized for different screen sizes to prevent overlap with music player. Home page game selection responsive (2 games on mobile, 3 on tablet/desktop). |
 
 ## Design Specification
 
@@ -129,11 +130,12 @@ ConstellationMusicSpace/
 │   ├── PlayerControls (play/pause/next/prev/volume/progress)
 │   ├── Auto-play on track selection
 │   └── ResponsiveDrawer (mobile/desktop layouts)
-├── LorePanel (fixed-size bottom-center panel)
-│   ├── 500x200px fixed dimensions at bottom 10%
-│   ├── Word-by-word animation
+├── LorePanel (responsive bottom-center panel)
+│   ├── Device-specific positioning: mobile (80px), tablet (20%), desktop (13%)
+│   ├── Responsive max heights: mobile (35%), tablet (25%), desktop (300px)
+│   ├── Word-by-word animation with optimized clearance
 │   ├── Top-left text alignment (stable positioning)
-│   └── Persistent display (no constellation name header)
+│   └── Persistent display with no overlap on music controls
 └── AudioManager (override site music, restore on exit)
 ```
 
@@ -142,9 +144,9 @@ ConstellationMusicSpace/
 **Timing Logic (Updated):**
 - Constellation cycles run independently of song timing
 - Each cycle shows: star appearance → connection → labeling → persistent display
-- New track selection triggers automatic music playback continuation
+- New track selection triggers automatic music playback continuation with fixed auto-play after track progression
 - Constellation label remains visible throughout entire cycle as 3D sprite
-- Lore panel stays open until next constellation cycle begins
+- Lore panel stays open until next constellation cycle begins with responsive positioning to avoid music player overlap
 - Clean cycle restart generates new constellation with different star patterns
 
 **Data Sources:**
@@ -179,6 +181,11 @@ ConstellationMusicSpace/
 - Auto-collapse after inactivity
 - Touch-friendly control sizes
 - Minimal "now playing" bar when collapsed
+- Lore panel positioned 80px from bottom to clear music controls
+
+**Tablet (768-1024px):**
+- Enhanced responsive positioning for lore panel (20% from bottom)
+- Optimized max height (25%) to prevent music player overlap
 
 ## Success Criteria
 
@@ -236,17 +243,23 @@ ConstellationMusicSpace/
   - [x] Fixed-size lore panel preventing layout shifts
   - [x] 3D scene integration for constellation labels
   - [x] Final UI/UX polish and stable animation cycles
+- [x] **Phase 6: Responsive Design & Music Continuity Fixes** ✅
+  - [x] Fixed auto-play music continuation after track progression
+  - [x] Implemented device-specific lore panel positioning (mobile/tablet/desktop)
+  - [x] Enhanced responsive design to prevent music player overlap
+  - [x] Optimized tablet experience with dedicated breakpoint handling
 
 ## Implementation Status: COMPLETE ✅
 
 All core functionality has been implemented and tested:
-- ✅ Music auto-play and seamless track selection
+- ✅ Music auto-play and seamless track selection with fixed track progression continuity
 - ✅ Stable constellation generation with no duplicates
 - ✅ Sequential star connections with enhanced coverage algorithm
 - ✅ 3D constellation labels rotating with scene
-- ✅ Fixed-size lore panel at bottom center with persistent display
+- ✅ Responsive lore panel positioning optimized for mobile, tablet, and desktop
 - ✅ Clean 4-phase animation cycles with proper state management
 - ✅ Audio manager integration for site music override/restore
+- ✅ Enhanced responsive design preventing music player UI conflicts
 
 ## Technical Decisions
 
@@ -259,9 +272,10 @@ All core functionality has been implemented and tested:
 - **Star Generation:** 4-7 stars per constellation with size variance (10% large, 30% medium, 60% normal)
 - **Label System:** 3D sprites positioned relative to last star in constellation (not centered)
 - **Label Positioning:** Offset above and to the right of the last star with rotation tracking
-- **Lore Panel:** Fixed 500x200px dimensions at bottom 10% with persistent display
+- **Lore Panel:** Responsive positioning - mobile (80px from bottom), tablet (20% from bottom), desktop (13% from bottom) with optimized max heights
 - **Phase Management:** Ref-based animation loops to prevent React re-render issues
 - **Memory Management:** Proper Three.js object disposal and cleanup on constellation changes
+- **Music Continuity:** Fixed auto-play logic in handleTrackEnd() to ensure seamless track progression
 
 ## Key Architectural Improvements
 
@@ -272,9 +286,9 @@ All core functionality has been implemented and tested:
 - **Enhanced Connection Algorithm:** Ensures 100% star connectivity with realistic patterns
 
 ### User Experience Enhancements  
-- **Auto-Play Music:** Tracks play immediately upon selection
+- **Auto-Play Music:** Tracks play immediately upon selection with fixed track progression continuity
 - **Clean Transitions:** Lore panel closes during constellation transitions and reopens with new lore
 - **Persistent Visual Elements:** Constellation labels remain visible throughout cycles
 - **3D Scene Integration:** Labels track with last star position and rotate naturally with constellation in 3D space
-- **Fixed Layout:** Lore panel maintains stable position during text animation
+- **Responsive Layout:** Device-specific lore panel positioning prevents music player overlap on all screen sizes
 - **Seamless Transitions:** Clean constellation generation without duplicates or glitches
