@@ -233,6 +233,31 @@ The music button has been successfully implemented with the following key featur
    - Music is paused but ready to resume
    - Click transitions to playing state
 
+#### Unified Music System Architecture
+The music button is part of a **unified music system** that provides consistent playback across the entire application:
+
+**Global Music Context**
+- Single source of truth for all music state
+- Shared between header button, music-space, and any future music components
+- Event-driven synchronization ensures all UI elements reflect current state
+
+**Cross-Page Consistency**
+- Music continues playing when navigating between pages
+- State persists across page transitions
+- Music-space acts as an enhanced interface for the same music system
+
+**Browser Autoplay Compliance**
+- User interaction detection through event handlers
+- Graceful fallback when autoplay is blocked
+- No console errors from premature play attempts
+
+#### Integration with Music Space
+When users navigate to the music-space page:
+- Music continues playing seamlessly (no interruption)
+- Music-space provides rich visual controls for the same audio
+- Constellation animations can be enhanced to react to the playing music
+- All controls (header button, music-space player) affect the same audio stream
+
 #### User Preference Logic
 ```typescript
 // On app initialization
@@ -247,11 +272,6 @@ const checkUserPreference = () => {
   }
 };
 ```
-
-#### Browser Autoplay Compliance
-- User interaction detection through event handlers
-- Graceful fallback when autoplay is blocked
-- No console errors from premature play attempts
 
 ## Open Questions
 
