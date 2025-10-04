@@ -53,7 +53,22 @@ Content: Comments are plain text.
 
 Display: Each comment will display the user's Display Name, the comment text, and a timestamp.
 
-Management: Users can edit or delete their own comments.
+Comment Visibility & Safety:
+
+Comments go through an automated safety review before appearing publicly.
+
+Authors see their comments immediately with a review status indicator (e.g., "AI moderator reviewing...").
+
+Other users see a placeholder (e.g., "[Username] is posting...") while comments are being reviewed (typically 2-5 seconds).
+
+Comments that don't pass safety review can be appealed for human review.
+
+3.4. Comment Management
+Editing: Users can edit their own comments after posting. Edited comments will display an updated timestamp.
+
+Deleting: Users can delete their own comments at any time.
+
+Appeals: If a comment is rejected during safety review, users can request a manual review by a moderator via a "Request Human Review" button.
 
 4. What is OUT OF SCOPE for Version 1.0
 To ensure a focused and timely initial release, the following features will be deferred to a future version:
@@ -66,9 +81,28 @@ Image & Media Uploads: The content body and comments will be text-only.
 
 Post Drafts & Scheduling (Admin): Posts are published immediately upon creation.
 
-Advanced Comment Moderation Tools: No admin tools for flagging, hiding, or editing user comments.
+Content Moderation Dashboard: Admin interface for reviewing flagged content and appeals (this is part of a platform-wide moderation system, not devlog-specific).
+
+User Reporting: Ability for users to report other users' comments (deferred to future version).
 
 5. Assumptions
 A robust user authentication system (account creation, login, logout) already exists and is functional.
 
 Every user has a unique ID and a publicly visible "Display Name."
+
+A centralized content moderation system (as specified in the UGC Technical Spec) is implemented and operational.
+
+Real-time updates via Firestore listeners are supported by the frontend framework.
+
+Cloud infrastructure (Cloud Functions, Cloud Run) for content moderation is deployed and configured.
+
+6. Technical Implementation Notes
+Comments follow the standardized UGC pipeline as defined in the technical specification:
+
+Storage: Comments are stored in the subcollection `devlogPosts/{postId}/comments/{commentId}`.
+
+Schema: Each comment uses the generic content document schema with moderation status fields.
+
+Moderation: All comments are subject to automated LLM moderation before public visibility.
+
+Real-time Updates: The system provides instant UI feedback to authors while maintaining safety for the broader community through the hybrid moderation approach.
