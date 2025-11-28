@@ -3,7 +3,7 @@
 
 ## 1\. High-Level Concept
 
-**Mystery Oracle** is a cooperative lateral thinking puzzle game. Players act as detectives trying to reconstruct a bizarre, complex sequence of events based on a single, cryptic starting clue. They do this by "interrogating" an AI that knows the whole truth but can only answer "YES," "NO," or "IRRELEVANT."
+**Mystery Oracle** Players act as detectives trying to reconstruct a bizarre, complex sequence of events. The narrator first set the scene. Then players can ask an AI that knows the whole truth but can only answer "YES," "NO," or "IRRELEVANT."
 
   * **Genre:** Logic Puzzle / Social Deduction / Casual Party Game
   * **Platform:** AI-driven Chat Interface
@@ -56,9 +56,8 @@ The game utilizes a **Dual-AI Architecture** to separate rigid logic from social
 
 ## 4\. Detailed Mechanics
 
-### A. Interrogation Rules (The `?` Trigger)
-
-Players can chat normally. To officially ask the Oracle, they must include a `?` anywhere in their message.
+### A. Interrogation Rules 
+Players can chat normally. To officially ask the Oracle
 
   * **Player Input:** `Guys, I think he's dead. ? Was he murdered?`
   * **System Route:** The message is routed to the Oracle AI.
